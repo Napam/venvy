@@ -8,13 +8,42 @@ _venvy_usage () {
 
     cat <<EOF
 Usage:
-  $self add <name> [executable]  Create, build and activate venv configuration. Optionally specify python executable.
-  $self use <name>               Activate venv
-  $self clean <name>             Clean venv cache, venv will be rebuilt on next usage
-  $self edit <name>              Edit requirements.txt for a venv
-  $self rm <name>                Remove venv
-  $self ls                       List configured venvs
-  $self {help, --help, -h}       Show this text
+  $self add <name> [executable]
+      Create, build and activate venv configuration. Optionally specify python executable.
+      For example: $self add test python3.8
+
+  $self use <name>
+      Activate venv.
+
+  $self deactivate
+      Deactivates current running venv. You can also just type 'deactivate' to use the
+      native python venv deactivation function.
+
+  $self clean <name>
+      Clean venv cache, venv will be rebuilt on next usage.
+
+  $self edit <name>
+      Edit requirements.txt for a venv. Will also run a 'pip install -r requirements.txt'
+      afterwards. This means that added packages will get installed automatically, but
+      removal of packages will not remove them from the actual installed packages in the
+      venv. You will have to remove using 'pip uninstall <package>' manually.
+
+  $self setexec <name> <executable>
+      Set Python executable to another path for a venv. This will in turn do a clean of
+      the venv cache of the specified venv, which will in turn rebuild the virtual
+      environment using the specified executable on the next run.
+
+  $self rm <name>
+      Remove venv.
+
+  $self ls
+      List configured venvs.
+
+  $self purge
+      Remove all venvs
+
+  $self {help, --help, -h}
+      Show this text
 EOF
 }
 
@@ -22,8 +51,17 @@ _venvy_ls () {
   find $VENVY_CONFIG_DIR -mindepth 1 -maxdepth 1 -type d -not -name '.*' -exec basename {} \; | sort
 }
 
-_venvy_could_not_find_venv () {
+_venvy_could_not_find_venv_error () {
   echo "Could not find the venv called '$1'. The available ones are:"
+  _venvy_ls
+}
+
+_venvy_invalid_executable_error () {
+  echo "Could not find the Python executable '$1', please specify a valid executable"
+}
+
+_venvy_missing_venv_name_error () {
+  echo "A name for the virtual environment must be specified:"
   _venvy_ls
 }
 
@@ -31,9 +69,14 @@ _venvy_add () {
   local venv_dir=$VENVY_CONFIG_DIR/$1
   local executable=$2
 
+  if [[ -z "${1// }" ]]; then
+    _venvy_missing_venv_name_error
+    return 1
+  fi
+
   if [[ -d $venv_dir ]]; then
     echo "A venv called '$1' already exists. Run 'venvy use $1' to activate it."
-    return 1;
+    return 1
   fi
 
   if command -v python >/dev/null; then
@@ -50,32 +93,54 @@ _venvy_add () {
   fi
 
   if ! command -v $executable >/dev/null; then
-    echo "Could find the Python executable '$executable', please specify a valid executable"
+    _venvy_invalid_executable_error $executable
     return 1;
   fi
 
   cp -r $VENVY_SRC_DIR/templates/venv $VENVY_CONFIG_DIR/$1
 
   # This is basically gnu sed -i, but it also works on MacOS
-  perl -i -pe "s/{executable}/$executable/g" $VENVY_CONFIG_DIR/$1/create.sh
+  perl -i -pe "s/{executable}/$executable/g" $VENVY_CONFIG_DIR/$1/metadata.txt
 
   echo "Created venv '$1'"
 
   _venvy_use $1
 }
 
+_venvy_build_and_activate () {
+  local dir_path=$1
+  local venv_path=$dir_path/venv
+  local req_file=${dir_path}/requirements.txt
+  local prompt_name=$(basename $dir_path)
+  local executable=$(awk -F= '$1 == "executable" {print $2; exit}' $dir_path/metadata.txt)
+
+  echo "Building virtual environment: $prompt_name"
+  echo "Using Python executable: $executable"
+  $executable -m venv --prompt $prompt_name $venv_path
+
+  echo "Activating virtual environment"
+  source ${venv_path}/bin/activate
+
+  echo "Installing requirements from $req_file"
+  pip install -r $req_file
+}
+
 _venvy_use () {
+  if [[ -z "${1// }" ]]; then
+    _venvy_missing_venv_name_error
+    return 1
+  fi
+
   local venv_dir=$VENVY_CONFIG_DIR/$1
   if [[ ! -e $venv_dir ]]; then
-    _venvy_could_not_find_venv $venv_dir
+    _venvy_could_not_find_venv_error $1
     return 1;
   fi
 
   local activate=$venv_dir/venv/bin/activate
 
   if [[ ! -f $activate ]]; then
-    local venv_create
-    bash $venv_dir/create.sh
+    _venvy_build_and_activate $venv_dir
   fi
 
   source $activate
@@ -84,12 +149,12 @@ _venvy_use () {
 _venvy_clean () {
   local venv_dir=$VENVY_CONFIG_DIR/$1
   if [[ ! -e $venv_dir ]]; then
-    _venvy_could_not_find_venv $venv_dir
+    _venvy_could_not_find_venv_error $venv_dir
     return 1;
   fi
 
   # If currenty using the venv that is to be cleaned, deactivate it first
-  if [[ $VIRTUAL_ENV == $venv_dir/venv ]]; then 
+  if [[ $VIRTUAL_ENV == $venv_dir/venv ]]; then
     deactivate
   fi
 
@@ -100,7 +165,7 @@ _venvy_clean () {
 _venvy_edit () {
   local venv_dir=$VENVY_CONFIG_DIR/$1
   if [[ ! -e $venv_dir ]]; then
-    _venvy_could_not_find_venv $venv_dir
+    _venvy_could_not_find_venv_error $venv_dir
     return 1;
   fi
 
@@ -123,28 +188,69 @@ _venvy_edit () {
   if [[ ! $editor ]]; then
     echo "Cannot open editor since could not find nano, vim, nor the EDITOR or the VENVY_EDITOR environment variables"
     echo "You can still find all the venv configuration files at $VENVY_CONFIG_DIR"
-    return 1;
+    return 1
   fi
 
   $editor $venv_dir/requirements.txt
 
-  _venvy_use $1
+  _venvy_build_and_activate $venv_dir
+}
+
+_venvy_setexec () {
+  local venv_dir=$VENVY_CONFIG_DIR/$1
+  if [[ ! -e $venv_dir ]]; then
+    _venvy_could_not_find_venv_error $1
+    return 1
+  fi
+  local new_executable=$2
+
+  if ! command -v $new_executable >/dev/null; then
+    _venvy_invalid_executable_error $new_executable
+    return 1
+  fi
+
+  local metadata_file=$VENVY_CONFIG_DIR/$1/metadata.txt
+
+  # This is basically gnu sed -i, but it also works on MacOS
+  perl -i -pe "s/(executable=).+/\1$new_executable/g" $metadata_file
+
+  echo "Executable for '$1' is now set to '$(awk -F= '$1 == "executable" {print $2; exit}' $metadata_file)'"
+
+  _venvy_clean $1
+  _venvy_build_and_activate $venv_dir
 }
 
 _venvy_remove () {
   local venv_dir=$VENVY_CONFIG_DIR/$1
   if [[ ! -e $venv_dir ]]; then
-    _venvy_could_not_find_venv $1
-    return 1;
+    _venvy_could_not_find_venv_error $1
+    return 1
   fi
 
   # If currenty using the venv that is to be deleted, deactivate it first
-  if [[ $VIRTUAL_ENV == $venv_dir/venv ]]; then 
+  if [[ $VIRTUAL_ENV == $venv_dir/venv ]]; then
     deactivate
   fi
 
   rm -rf $venv_dir
   echo "Removed venv '$1'"
+}
+
+_venvy_purge () {
+  local response
+  printf "Are you sure you want to delete all configured virtual environments? (y/n): "
+  read response
+  if [[ ! $response =~ ^[Yy]$ ]]; then
+    echo "Aborted purge"
+    return 0
+  fi
+
+  if [[ $VIRTUAL_ENV ]]; then
+    deactivate
+  fi
+
+  find $VENVY_CONFIG_DIR -mindepth 1 -maxdepth 1 -type d -not -name ".*" -exec rm -rf {} +
+  echo "Successfully removed all venvs"
 }
 
 _venvy_initialize_files_in_home_if_needed () {
@@ -153,7 +259,7 @@ _venvy_initialize_files_in_home_if_needed () {
   fi
 
   if [[ ! -f $VENVY_CONFIG_DIR/.gitignore ]]; then
-    cp $VENVY_SRC_DIR/templates/home/gitignore $VENVY_CONFIG_DIR/.gitignore 
+    cp $VENVY_SRC_DIR/templates/home/gitignore $VENVY_CONFIG_DIR/.gitignore
   fi
 
   if [[ ! -f $VENVY_CONFIG_DIR/README.md ]]; then
@@ -163,7 +269,7 @@ _venvy_initialize_files_in_home_if_needed () {
 
 venvy () {
   if [[ $# -lt 1 ]]; then
-    echo 'Insufficient arguments'
+    echo 'Insufficient arguments\n'
     _venvy_usage
     return 1
   fi
@@ -178,19 +284,26 @@ venvy () {
     _venvy_add $venv_name $executable
   elif [[ $subcommand == 'use' ]]; then
     _venvy_use $venv_name
+  elif [[ $subcommand == 'deactivate' ]]; then
+    deactivate
   elif [[ $subcommand == 'clean' ]]; then
     _venvy_clean $venv_name
   elif [[ $subcommand == 'edit' ]]; then
     _venvy_edit $venv_name
+  elif [[ $subcommand == 'setexec' ]]; then
+    local executable=$3
+    _venvy_setexec $venv_name $executable
   elif [[ $subcommand == 'rm' ]]; then
     _venvy_remove $venv_name
   elif [[ $subcommand == 'ls' ]]; then
     _venvy_ls
+  elif [[ $subcommand == 'purge' ]]; then
+    _venvy_purge
   elif [[ $subcommand == '-h' || $subcommand == '--help' || $subcommand == 'help' ]]; then
     _venvy_usage
   else
     echo "Unknown subcommand: $subcommand"
     _venvy_usage
     return 1
-  fi 
+  fi
 }
