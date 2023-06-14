@@ -162,6 +162,11 @@ _venvy_use () {
 
 _venvy_clean () {
   local venv_name=$1
+  if [[ -z "${venv_name// }" ]]; then
+    _venvy_missing_venv_name_error
+    return 1
+  fi
+
   local venv_dir=$VENVY_CONFIG_DIR/$venv_name
   if [[ ! -e $venv_dir ]]; then
     _venvy_could_not_find_venv_error $venv_dir
@@ -253,8 +258,13 @@ _venvy_setexec () {
   _venvy_build $venv_dir
 }
 
-_venvy_remove () {
+_venvy_rm () {
   local venv_name=$1
+  if [[ -z "${venv_name// }" ]]; then
+    _venvy_missing_venv_name_error
+    return 1
+  fi
+
   local venv_dir=$VENVY_CONFIG_DIR/$venv_name
   if [[ ! -e $venv_dir ]]; then
     _venvy_could_not_find_venv_error $venv_name
@@ -328,7 +338,7 @@ venvy () {
     local executable=$3
     _venvy_setexec $venv_name $executable
   elif [[ $subcommand == 'rm' ]]; then
-    _venvy_remove $venv_name
+    _venvy_rm $venv_name
   elif [[ $subcommand == 'ls' ]]; then
     _venvy_ls
   elif [[ $subcommand == 'purge' ]]; then
