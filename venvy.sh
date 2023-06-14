@@ -51,7 +51,7 @@ EOF
 }
 
 _venvy_ls () {
-  find $VENVY_CONFIG_DIR -mindepth 1 -maxdepth 1 -type d -not -name '.*' -exec basename {} \; | sort
+  find $VENVY_CONFIG_DIR/ -mindepth 1 -maxdepth 1 -type d -not -name '.*' -exec basename {} \; | sort
 }
 
 _venvy_could_not_find_venv_error () {
@@ -283,7 +283,7 @@ _venvy_purge () {
     deactivate
   fi
 
-  find $VENVY_CONFIG_DIR -mindepth 1 -maxdepth 1 -type d -not -name ".*" -exec rm -rf {} +
+  find $VENVY_CONFIG_DIR/ -mindepth 1 -maxdepth 1 -type d -not -name ".*" -exec rm -rf {} +
   echo "Successfully removed all venvs"
 }
 
