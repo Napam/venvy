@@ -46,6 +46,8 @@ The simplest way to install is to clone this repo to `$HOME/.local/src/venvy`, t
 ## How it works
 Assuming you have ran `venvy` once, venvy should have initialized some files in your environment. The venvy configuration files are stored at `$HOME/.config/venvy`. The directory is "git friendly". It is the one meant to be added to your dotfiles repository. It should contain an `.gitignore` that ignores the cache files of the virtual environments, such that the only things that git tracks are the requirements the their names, and which executable they use. The configuration files are meant to editable, so feel free to mess around there directly. The commands only read / and write to those configuration files.
 
+Venvy will use whatever python exisists in your environment, but it has to be new enough to have the `venv` module built in. If you want to have virtual environments that are tied to something other than your default `python`/`python3` executables, you just specify something else. See the section below.
+
 ### Quick overview of possible commands
 Here is what you get from `venvy --help` or just `venvy`
 ```
