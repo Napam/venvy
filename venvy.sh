@@ -37,16 +37,16 @@ Usage:
       environment using the specified executable on the next run.
 
   $self rm <name>
-      Remove venv.
+      Remove specified venv.
 
   $self ls
-      List configured venvs.
+      List configured all venvs.
 
   $self purge
       Remove all venvs. Will require an interactive confirmation.
 
   $self {help, --help, -h}
-      Show this text
+      Show this text.
 EOF
 }
 
