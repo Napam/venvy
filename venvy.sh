@@ -207,7 +207,7 @@ _venvy_edit () {
   fi
 
   if command -v nano >/dev/null; then
-    local executable=nano
+    local editor=nano
   fi
 
   if command -v vim >/dev/null; then
