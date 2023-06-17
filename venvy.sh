@@ -175,17 +175,11 @@ _venvy_clean () {
 
   # If currenty using the venv that is to be cleaned, deactivate it first
   if [[ $VIRTUAL_ENV == $venv_dir/venv ]]; then
-    local activate_again=1
     deactivate
   fi
 
   rm -rf $venv_dir/venv
   echo "Cleaned venv '$venv_name'"
-
-  if [[ $activate_again ]]; then
-    echo "Reactivating newly cleaned venv '$venv_name'"
-    _venvy_build_and_activate $venv_dir
-  fi
 }
 
 _venvy_edit () {
