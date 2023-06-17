@@ -204,16 +204,24 @@ _venvy_edit () {
     local editor=nano
   fi
 
+  if command -v vi >/dev/null; then
+    local editor=vi
+  fi
+
   if command -v vim >/dev/null; then
     local editor=vim
   fi
 
-  if command -v $EDITOR >/dev/null; then
-    local editor=$EDITOR
+  if command -v nvim >/dev/null; then
+    local editor=nvim
   fi
 
-  if command -v $VENVY_EDITOR >/dev/null; then
-    local editor=$VENVY_EDITOR
+  if [[ $EDITOR && $(command -v $EDITOR) ]]; then
+     local editor=$EDITOR
+  fi
+
+  if [[ $VENVY_EDITOR && $(command -v $VENVY_EDITOR) ]]; then
+     local editor=$VENVY_EDITOR
   fi
 
   if [[ ! $editor ]]; then
