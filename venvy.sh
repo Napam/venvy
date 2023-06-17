@@ -228,9 +228,14 @@ _venvy_edit () {
     return 1
   fi
 
-  $editor $venv_dir/requirements.txt
+  local req_file=$venv_dir/requirements.txt
+  local checksum_before=$(md5 -q $req_file)
+  $editor $req_file
+  local checksum_after=$(md5 -q $req_file)
 
-  _venvy_build $venv_dir
+  if [[ $checksum_before != $checksum_after ]]; then
+    _venvy_build $venv_dir
+  fi
 }
 
 _venvy_setexec () {
