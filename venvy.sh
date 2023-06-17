@@ -216,6 +216,10 @@ _venvy_edit () {
     local editor=nvim
   fi
 
+  # One could think that just using command -v $VAR would be enough.
+  # But in ZSH command -v $EMPTY_VAR returns 1, but in bash it returns 0.
+  # Therefore check if $VARIABLE exist and then command
+ 
   if [[ $EDITOR && $(command -v $EDITOR) ]]; then
      local editor=$EDITOR
   fi
