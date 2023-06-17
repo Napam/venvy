@@ -265,8 +265,16 @@ _venvy_setexec () {
 
   echo "Executable for '$venv_name' is now set to '$(awk -F= '$1 == "executable" {print $2; exit}' $metadata_file)'"
 
+  if [[ $VIRTUAL_ENV == $venv_dir/venv ]]; then
+    local reactivate=1
+  fi
+
   _venvy_clean $venv_name
   _venvy_build $venv_dir
+
+  if [[ $reactivate ]]; then
+    _venvy_use $venv_name
+  fi
 }
 
 _venvy_rm () {
