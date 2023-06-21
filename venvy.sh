@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-
+export VENVY_CACHE_DIR=$HOME/.cache/venvy
 export VENVY_CONFIG_DIR=$HOME/.config/venvy
 export VENVY_SRC_DIR=$HOME/.local/src/venvy
 
@@ -45,7 +44,7 @@ Usage:
   $self purge
       Remove all venvs. Will require an interactive confirmation.
 
-  $self {help, --help, -h}
+  $self help
       Show this text.
 EOF
 }
@@ -370,3 +369,5 @@ venvy () {
     return 1
   fi
 }
+
+source $VENVY_SRC_DIR/completions/init.sh
