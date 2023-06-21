@@ -72,8 +72,8 @@ _venvy_add () {
   local executable=$2
   local venv_dir=$VENVY_CONFIG_DIR/$venv_name
 
-  if [[ -z "${venv_name// }" ]]; then
-    _venvy_missing_venv_name_error
+  if [[ -z $venv_name ]]; then
+    echo "You must specify a name. For example 'venvy add test'. You can also specify an executable as well, like 'venvy add legacy python3.8'"
     return 1
   fi
 
