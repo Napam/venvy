@@ -3,16 +3,16 @@
 *Python virtual environment orchestration done simply and reusably*
 
 ## Background and reasoning behind Venvy
-A way to store and synchronize configuration files such as `.vimrc`, `.zshrc`, `.bashrc` across different computers / OS installations is to have a "[dotfiles](https://en.wikipedia.org/wiki/Hidden_file_and_hidden_directory#Unix_and_Unix-like_environments)" repository. It is basically a repostory with such configaration files that often are prefixed dot a dot, hence the name, and then one typically symlinks the dotfiles to their appropriate locations.
+A way to store and synchronize configuration files such as `.vimrc`, `.zshrc`, `.bashrc` across different computers / OS installations is to have a "[dotfiles](https://en.wikipedia.org/wiki/Hidden_file_and_hidden_directory#Unix_and_Unix-like_environments)" repository. It is basically a repostory with such configaration files that often are prefixed a dot, hence the name, and then one typically symlinks the dotfiles to their appropriate locations from the repository.
 
 I simply wanted to have my Python virtual environments in my dotfiles repository. Thus I created Venvy, a tool which orchestrates Python's integrated `venv` module such that the virtual environments are stored in a "dotfile-repo-friendly" manner.
 
-I will assume users are familiar with the `requirements.txt` convention of Python.
+I will assume users are familiar with the `requirements.txt` convention of Python. A venvy virtual environment is essentially a `requirements.txt` file along with data about which Python executable is to be used. The python venv files themselves are considered as cache and are git ignored.
 
 ## Installation
-Venvy is entirely written in bash. As long as you have a working bash (or something compatible with bash code) environment it should work.
+Venvy is entirely written in bash. As long as you have a working bash environment it should work. Zsh will also work as it can run bash code.
 
-The simplest way to install is to clone this repo to `$HOME/.local/src/venvy`, then just make sure that the `venvy.sh` file gets sources when you start your terminal. Here are some specific instructions for different shells:
+The simplest way to install `venvy` is to clone this repo to `$HOME/.local/src/venvy` (has to be at that location), then just make sure that the `venvy.sh` file gets sources when you start your terminal. Here are some specific instructions for different shells:
 
 ### bash
 1. Run `git clone git@github.com:Napam/venvy.git $HOME/.local/src/venvy`
@@ -44,9 +44,9 @@ The simplest way to install is to clone this repo to `$HOME/.local/src/venvy`, t
 1. Deactivate the virtual environment with: `deactivate`
 
 ## How it works
-Assuming you have ran `venvy` once, venvy should have initialized some files in your environment. The venvy configuration files are stored at `$HOME/.config/venvy`. The directory is "git friendly". It is the one meant to be added to your dotfiles repository. It should contain an `.gitignore` that ignores the cache files of the virtual environments, such that the only things that git tracks are the requirements the their names, and which executable they use. The configuration files are meant to editable, so feel free to mess around there directly. The commands only read / and write to those configuration files.
+Assuming you have ran `venvy` once, venvy should have initialized some files in your environment. The venvy configuration files are stored at `$HOME/.config/venvy`. The directory is "git friendly". It is the one meant to be added to your dotfiles repository. It contains a `.gitignore` that ignores the cache files of the virtual environments, such that the only things that git tracks are the requirements the their names, and which executable they use. The configuration files are meant to editable, so feel free to mess around there directly. The commands only read / and write to those configuration files.
 
-Venvy will use whatever python exisists in your environment, but it has to be new enough to have the `venv` module built in. If you want to have virtual environments that are tied to something other than your default `python`/`python3` executables, you just specify something else. See the section below.
+Venvy will use whatever python exisists in your environment, but it has to be new enough to have the `venv` module built in, that is you need Python 3.3 or higher. If you want to have virtual environments that are tied to something other than your default `python`/`python3` executables, you just specify something else. See the section below.
 
 ### Quick overview of possible commands
 Here is what you get from `venvy --help` or just `venvy`
@@ -88,6 +88,6 @@ venvy ls
 venvy purge
   Remove all venvs. Will require an interactive confirmation.
 
-venvy {help, --help, -h}
+venvy help
   Show this text
 ```
