@@ -2,6 +2,12 @@
 # Venvy
 *Python virtual environment orchestration done simply and reusably*
 
+## Features
+- Defines a set of handy terminal commands to orchestrate different Python virtual environments
+- The venvy-wrapped virtual environments are made in a dotfile-repo friendly manner
+- Only uses native Python (no external dependencies)
+- Handling for different Python executables (for example different Python versions) for each virtual environment
+
 ## Background and reasoning behind Venvy
 A way to store and synchronize configuration files such as `.vimrc`, `.zshrc`, `.bashrc` across different computers / OS installations is to have a "[dotfiles](https://en.wikipedia.org/wiki/Hidden_file_and_hidden_directory#Unix_and_Unix-like_environments)" repository. It is basically a repostory with such configaration files that often are prefixed a dot, hence the name, and then one typically symlinks the dotfiles to their appropriate locations from the repository.
 
@@ -34,6 +40,9 @@ The simplest way to install `venvy` is to clone this repo to `$HOME/.local/src/v
 1. Run `. $HOME/.zshrc`
 1. You should now see venvy's help screen
 
+## Adding the configuration to your dotfiles repository
+Add the following directory: `$HOME/.config/venvy`.
+
 ## Quickstart
 1. Add a virtual environment: `venvy add test`
 1. Edit its underlying `requirements.txt` file: `venvy edit`. For example add `numpy`.
@@ -43,13 +52,16 @@ The simplest way to install `venvy` is to clone this repo to `$HOME/.local/src/v
 1. Do `pip list` to see that `numpy` is one of the dependencies.
 1. Deactivate the virtual environment with: `deactivate`
 
+## Tab completion
+As of this date `venvy` only has tab compoletion (bash is WIP). Try write `venvy` followed with a tab, you should get tab completion.
+
 ## How it works
 Assuming you have ran `venvy` once, venvy should have initialized some files in your environment. The venvy configuration files are stored at `$HOME/.config/venvy`. The directory is "git friendly". It is the one meant to be added to your dotfiles repository. It contains a `.gitignore` that ignores the cache files of the virtual environments, such that the only things that git tracks are the requirements the their names, and which executable they use. The configuration files are meant to editable, so feel free to mess around there directly. The commands only read / and write to those configuration files.
 
 Venvy will use whatever python exisists in your environment, but it has to be new enough to have the `venv` module built in, that is you need Python 3.3 or higher. If you want to have virtual environments that are tied to something other than your default `python`/`python3` executables, you just specify something else. See the section below.
 
 ### Quick overview of possible commands
-Here is what you get from `venvy --help` or just `venvy`
+Here is what you get from `venvy --help` or just `venvy`. It is shows everything you can do with `venvy`.
 ```
 venvy add <name> [executable]
   Create, build and activate venv configuration. Optionally specify python executable.
@@ -91,3 +103,8 @@ venvy purge
 venvy help
   Show this text
 ```
+
+## Similar tools
+
+### [virtualenvwrapper](https://github.com/python-virtualenvwrapper/virtualenvwrapper)
+It is very similar to this venvy. However, it is not based on Python built in venv module, but rather Ian Bicking’s virtualenv tool, and it does not have as dot-file friendly config structure like this one. It is however way more feature rich. Venvy aims to be minimal and simple without too many bells and whistles.
