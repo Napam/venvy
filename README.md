@@ -1,4 +1,3 @@
-
 # Venvy
 *Python virtual environment orchestration done simply and reusably*
 
@@ -107,4 +106,4 @@ venvy help
 ## Similar tools
 
 ### [virtualenvwrapper](https://github.com/python-virtualenvwrapper/virtualenvwrapper)
-It is very similar to this venvy. However, it is not based on Python built in venv module, but rather Ian Bicking’s virtualenv tool, and it does not have as dot-file friendly config structure like this one. It is however way more feature rich. Venvy aims to be minimal and simple without too many bells and whistles.
+It is very similar to this venvy. However, it is not based on Python's built in venv module, but rather Ian Bicking’s virtualenv tool. It does not have as dot-file friendly config structure like this one. It is however way more feature rich. Venvy aims to be minimal and simple without too many bells and whistles.
