@@ -53,7 +53,7 @@ Add the following directory: `$HOME/.config/venvy`.
 1. Deactivate the virtual environment with: `deactivate`
 
 ## Tab completion
-As of this date `venvy` only has tab compoletion (bash is WIP). Try write `venvy` followed with a tab, you should get tab completion.
+Venvy has tab completion for `zsh` and `bash`. Try write `venvy` followed with a tab, you should get tab completion.
 
 ## How it works
 Assuming you have ran `venvy` once, venvy should have initialized some files in your environment. The venvy configuration files are stored at `$HOME/.config/venvy`. The directory is "git friendly". It is the one meant to be added to your dotfiles repository. It contains a `.gitignore` that ignores the cache files of the virtual environments, such that the only things that git tracks are the requirements the their names, and which executable they use. The configuration files are meant to editable, so feel free to mess around there directly. The commands only read / and write to those configuration files.
