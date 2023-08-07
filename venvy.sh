@@ -234,9 +234,9 @@ _venvy_edit () {
   fi
 
   local req_file=$venv_dir/requirements.txt
-  local checksum_before=$(md5sum $req_file | cut -d' ' -f1)
+  local checksum_before=$(md5 $req_file | cut -d' ' -f4)
   $editor $req_file
-  local checksum_after=$(md5sum $req_file | cut -d' ' -f1)
+  local checksum_after=$(md5 $req_file | cut -d' ' -f4)
 
   if [[ $checksum_before != $checksum_after ]]; then
     _venvy_build $venv_dir
