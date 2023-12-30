@@ -62,45 +62,50 @@ Venvy will use whatever python exisists in your environment, but it has to be ne
 ### Quick overview of possible commands
 Here is what you get from `venvy --help` or just `venvy`. It is shows everything you can do with `venvy`.
 ```
-venvy add <name> [executable]
-  Create, build and activate venv configuration. Optionally specify python executable.
-  For example: venvy add test python3.8
+Usage:
+  venvy add <name> [executable]
+      Create, build and activate venv configuration. Optionally specify python executable.
+      For example: venvy add test python3.8
 
-venvy use <name>
-  Activate venv.
+  venvy use <name>
+      Activate venv.
 
-venvy deactivate
-  Deactivates current running venv. You can also just type 'deactivate' to use the
-  native python venv deactivation function.
+  venvy deactivate
+      Deactivates current running venv. You can also just type 'deactivate' to use the
+      native python venv deactivation function.
 
-venvy clean <name>
-  Clean venv cache, venv will be rebuilt on next usage. If you are currently using the
-  venv, it will be deactivated for you automatically.
+  venvy clean <name>
+      Clean venv cache, venv will be rebuilt on next usage. If you are currently using the
+      venv, it will be deactivated for you automatically.
 
-venvy edit [name]
-  Edit requirements.txt for a venv. It will use your current activated venv, or you
-  can specify which venv you want to edit. Will also run a 'pip install -r
-  requirements.txt' afterwards. This means that added packages will get installed
-  automatically, but removal of packages will not remove them from the actual
-  installed packages in the venv. You will have to remove using 'pip uninstall
-  <package>' manually if that is desired.
+  venvy edit [name]
+      Edit requirements.txt for a venv. It will use your current activated venv, or you
+      can specify which venv you want to edit. Will also run a 'pip install -r
+      requirements.txt' afterwards. This means that added packages will get installed
+      automatically, but removal of packages will not remove them from the actual
+      installed packages in the venv. You will have to remove using 'pip uninstall
+      <package>' manually if that is desired.
 
-venvy setexec <name> <executable>
-  Set Python executable to another path for a venv. This will in turn do a clean of
-  the venv cache of the specified venv, which will in turn rebuild the virtual
-  environment using the specified executable on the next run.
+  venvy setexec <name> <executable>
+      Set Python executable to another path for a venv. This will in turn do a clean of
+      the venv cache of the specified venv, which will in turn rebuild the virtual
+      environment using the specified executable on the next run.
 
-venvy rm <name>
-  Remove venv.
+  venvy rm <name>
+      Remove specified venv.
 
-venvy ls
-  List configured venvs.
+  venvy ls
+      List configured all venvs.
 
-venvy purge
-  Remove all venvs. Will require an interactive confirmation.
+  venvy mv <old> <new>
+      Move a venv to a new name. 
 
-venvy help
-  Show this text
+  venvy purge
+      Remove all venvs. Will require an interactive confirmation.
+
+  venvy help
+      Show this text.
+
 ```
 
 ## Similar tools
