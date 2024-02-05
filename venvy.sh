@@ -254,12 +254,14 @@ _venvy_edit() {
     _venvy_build $venv_dir $staging_req_name
 
     # Handle git+https:// urls
-    local git_freeze=$(pip freeze | perl -nle 'print "$1 $2" if /(.+) @ (git\+https:\/\/.+)@/')
-    local temp_file="./.temp"
-    echo $git_freeze | while read line; do
-      read -r name url <<< $line
-      awk -v name="$name" -v url="$url" '{print (index($0, url) != 0 ? $0 "#egg="name : $0)}' $staging_req_file > "$temp_file" && mv "$temp_file" $staging_req_file
-    done
+    local git_install_packages=$(pip freeze | perl -nle 'print "$1 $2" if /(.+) @ (git\+https:\/\/.+)@/')
+    if [[ $git_install_packages ]]; then
+      local temp_file="./.temp"
+      echo $git_install_packages | while read line; do
+        read -r name url <<< $line
+        awk -v name="$name" -v url="$url" '{print (index($0, url) != 0 ? $0 "#egg="name : $0)}' $staging_req_file > "$temp_file" && mv "$temp_file" $staging_req_file
+      done
+    fi
 
     cat $staging_req_file | grep -E '^[^\#]' | pip freeze -r /dev/stdin | awk '/##.+pip freeze:/ {exit} {print}' > $curr_req_file
     rm $staging_req_file
