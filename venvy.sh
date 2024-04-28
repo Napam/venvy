@@ -385,7 +385,7 @@ _venvy_purge() {
   echo "Successfully removed all venvs"
 }
 
-_venvy_initialize_files_in_home_if_needed() {
+_venvy_ensure_home_files() {
   if [[ ! -d $VENVY_CONFIG_DIR ]]; then
     mkdir -p $VENVY_CONFIG_DIR
   fi
@@ -406,7 +406,7 @@ venvy() {
     return 1
   fi
 
-  _venvy_initialize_files_in_home_if_needed
+  _venvy_ensure_home_files
 
   local subcommand=$1
   local venv_name=$2
@@ -443,5 +443,3 @@ venvy() {
     return 1
   fi
 }
-
-source $VENVY_SRC_DIR/completions/init.sh
